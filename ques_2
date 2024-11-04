@@ -1,0 +1,31 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+iris_data = pd.read_csv('Iris.csv')
+
+print(iris_data.head())
+
+species_column = 'Species'
+features = iris_data.drop([species_column, 'Id'], axis=1) 
+target = iris_data[species_column]
+
+features_train, features_test, target_train, target_test = train_test_split(features, target, test_size=0.3, random_state=42)
+
+naive_bayes_model = GaussianNB()
+naive_bayes_model.fit(features_train, target_train)
+
+target_pred = naive_bayes_model.predict(features_test)
+
+model_accuracy = accuracy_score(target_test, target_pred)
+model_error_rate = 1 - model_accuracy
+confusion_matrix_result = confusion_matrix(target_test, target_pred)
+classification_report_result = classification_report(target_test, target_pred, target_names=iris_data[species_column].unique())
+
+print("Confusion Matrix:")
+print(confusion_matrix_result)
+print("\nClassification Report:")
+print(classification_report_result)
+print(f"\nAccuracy: {model_accuracy * 100:.2f}%")
+print(f"Error Rate: {model_error_rate * 100:.2f}%")
