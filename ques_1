@@ -1,0 +1,36 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import CategoricalNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+data = pd.read_csv('decision_data.csv')
+
+print(data.head())
+
+label_column = 'Decision'
+
+data[label_column] = data[label_column].map({'Yes': 1, 'No': 0})
+
+data = data.drop('Day', axis=1)
+
+features = pd.get_dummies(data.drop(label_column, axis=1))
+target = data[label_column]
+
+features_train, features_test, target_train, target_test = train_test_split(features, target, test_size=0.3, random_state=42)
+
+nb_classifier = CategoricalNB()
+nb_classifier.fit(features_train, target_train)
+
+target_pred = nb_classifier.predict(features_test)
+
+model_accuracy = accuracy_score(target_test, target_pred)
+model_error_rate = 1 - model_accuracy
+confusion_mat = confusion_matrix(target_test, target_pred)
+classification_rep = classification_report(target_test, target_pred, target_names=['No', 'Yes'])
+
+print("Confusion Matrix:")
+print(confusion_mat)
+print("\nClassification Report:")
+print(classification_rep)
+print(f"\nAccuracy: {model_accuracy * 100:.2f}%")
+print(f"Error Rate: {model_error_rate * 100:.2f}%")
